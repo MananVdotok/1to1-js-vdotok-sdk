@@ -1,54 +1,59 @@
-import React, { useEffect, useState } from "react";
-// import VDOTOK from "./constants/vdotok-call.js";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-const App = () => {
-  const [user, setUser] = useState();
+
+const MyComponent = () => {
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetchLogin();
+    fetchData();
   }, []);
 
-  const fetchLogin = () => {
+  const fetchData = () => {
     axios
       .post("https://q-tenant.vdotok.dev/API/v0/Login", {
-        projectId: "1RN1RP",
+        project_id: "1RN1RP",
         email: "david@test.com",
         password: "password",
       })
-      .then((res) => {
-        console.log("res aftrer login", res);
-        setUser(res.data);
-        initializeSDK();
+      .then((response) => {
+        setUser(response.data);
       })
-      .catch((err) => {
-        console.log("error: ", err);
+      .catch((error) => {
+        console.error("Error fetching data:", error);
       });
   };
 
-  let initializeSDK = () => {
-    console.log(user, "fasdfasfasfas");
+  useEffect(() => {
+    if (user !== null) {
+      initializeSDK();
+    }
+  }, [user]);
+
+  const initializeSDK = () => {
+    // Access the state data immediately after setting it
+    console.log(user);
 
     // connect client to server
-    // console.log("user: " + JSON.stringify(user));
-    // let params = {
-    //   projectId: "23SBP2Y",
-    //   host: "wss://q-signalling.vdotok.dev:8443/call",
-    //   stunServer: "r-stun1.vdotok.dev:3478",
-    // };
-    // let client = new CVDOTOK.Client(params);
+    console.log("user: " + JSON.stringify(user));
+    let params = {
+      projectId: "23SBP2Y",
+      host: user.media_server_map.complete_address,
+      stunServer: user.stun_server_map.complete_address,
+    };
+    let client = new CVDOTOK.Client(params);
 
-    // client.on("connected", (res) => {
-    //   // setConnect(true)
-    //   // console.log("sdk connected", res);
-    //   console.log(
-    //     JSON.stringify(user),
-    //     "<----------------------------------------------------------------"
-    //   );
-    //   client.Register(user.authorization_token, user.ref_id);
-    //   client.on("register", (response) => {
-    //     console.log("register", response);
-    //   });
-    // });
+    client.on("connected", (res) => {
+      // setConnect(true)
+      // console.log("sdk connected", res);
+      console.log(
+        JSON.stringify(user),
+        "<----------------------------------------------------------------"
+      );
+      client.Register(user.authorization_token, user.ref_id);
+      client.on("register", (response) => {
+        console.log("register", response);
+      });
+    });
   };
 
   return (
@@ -59,4 +64,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default MyComponent;
