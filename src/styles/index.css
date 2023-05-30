@@ -1,0 +1,89 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.Container {
+  border: 4px solid rgb(38, 0, 255);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.localVideo,
+.remoteVideo {
+  width: 50%;
+  height: 50%;
+}
+
+.parent {
+  background-color: #262e35;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  border: 4px solid gray;
+  width: 100vw;
+  height: 100vh;
+}
+
+.dataLoading:empty {
+  display: inline-block;
+  height: 80px;
+  overflow: hidden;
+  position: relative;
+  vertical-align: middle;
+  width: 120px;
+  z-index: 555;
+}
+
+.dataLoading:empty:before {
+  background-image: radial-gradient(circle, rgb(255, 64, 64) 8px, transparent 8px);
+  background-repeat: repeat-x;
+  background-size: 40px;
+  background-position-y: 18px;
+  content: " ";
+  display: inline-block;
+  height: 50px;
+  left: 0;
+  position: absolute;
+  width: 120px;
+  z-index: 556;
+}
+
+@keyframes loadingCircles {
+  100% {
+    left: 160px;
+  }
+}
+.dataLoading:empty:before {
+  animation-name: loadingCircles;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: steps(4);
+}
+
+/* Position the CodePen */
+body {
+  background: #1d1f20;
+  height: 100vh;
+}
+
+.dataLoading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dummy {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dummy span {
+  color: #171254;
+  font-weight: 900;
+  font-size: xxx-large;
+}/*# sourceMappingURL=index.css.map */
