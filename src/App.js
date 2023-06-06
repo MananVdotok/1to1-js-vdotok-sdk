@@ -4,6 +4,7 @@ import axios from "axios";
 const MyComponent = () => {
   const [user, setUser] = useState(null);
   const [Client, setClient] = useState(null);
+  const [loading, setLoading] = useState("initiating");
   const videoRef = useRef(null);
 
   // fetching user login
@@ -46,11 +47,12 @@ const MyComponent = () => {
       const stream = videoRef.current.srcObject;
       const tracks = stream.getTracks();
       tracks.forEach((track) => track.stop());
-      document.querySelector(".Container").style.display = "none";
-      document.querySelector(".dummy").style.display = "flex";
 
-      setClient(null);
+      // setClient(null);
     }
+
+    document.querySelector(".Container").style.display = "none";
+    document.querySelector(".dummy").style.display = "flex";
   };
 
   //initializingSDK
@@ -65,6 +67,11 @@ const MyComponent = () => {
     if (Client !== null) {
       Client.on("register", (response) => {
         // console.log("register", response);
+        setLoading("Socket Connected");
+        console.warn(
+          loading,
+          "================================================"
+        );
         console.log("sdk connected...");
       });
     }
@@ -77,6 +84,7 @@ const MyComponent = () => {
       projectId: "1RN1RP",
       host: user.media_server_map.complete_address,
       stunServer: user.stun_server_map.complete_address,
+      ignorePublicIP: true,
     };
 
     // connect client to server
@@ -89,6 +97,8 @@ const MyComponent = () => {
       //   "<----------------------------------------------------------------"
       // );
       client.Register(user.ref_id, user.authorization_token);
+      setLoading("connecting");
+      console.warn(loading, "=====");
       console.log("connecting SDK********************************");
 
       // error handling
@@ -101,12 +111,22 @@ const MyComponent = () => {
       });
     });
 
-    client.on("disconnect", (response) => {
+    client.on("close ", (response) => {
       //on disconnecting
+      console.log("disconnect", response);
+      setLoading("Socket Disconnected");
+      console.warn(loading, "=====");
       stopCamera();
     });
+    // client.on("disconnect", (response) => {
+    //   console.log("disconnect", response);
+    //   setLoading("Socket Disconnected");
+    //   console.warn(loading, "=====");
+    //   stopCamera();
+    // });
 
     client.on("call", (response) => {
+      console.log("call-------------------------", response);
       //////////////////
       //// caller case when someone makes a call
       if (response.type == "TRYING") {
@@ -122,23 +142,35 @@ const MyComponent = () => {
         // when your call is attended by receiver
         console.log("call Accepted--------------------");
       } else if (response.type == "CALL_REJECTED") {
+        end_Call();
+        stopCamera();
         // when your call is rejected by receiver
         console.log("call Rejected--------------------");
       } else if (response.type == "CALL_ENDED") {
         // when call is ended both receives this event
+        end_Call();
+        stopCamera();
         console.log("call Ended--------------------");
       } else if (response.type == "CALL_RECEIVED") {
+        stopCamera();
         // when call is ended both receives this event
         console.log("CALL_RECEIVED--------------------");
       } else if (response.type == "MISSED_CALL") {
         // when call is ended both receives this event
         console.log("MISSED_CALL--------------------");
+      } else if (response.type == "drop") {
+        console.log("DROP_CALL--------------------");
+      } else if (response.type == "SOCKET_DROPPED") {
+        console.warn("DROP_CALL--------------------");
+        setLoading("Socket Disconnected");
+        console.warn(loading, "=====");
+        stopCamera();
       }
     });
   };
 
   const initiateCall = () => {
-    if (Client !== null) {
+    if (Client !== null && !videoRef.current.srcObject) {
       // const params = {
       //   localVideo: '',
       //   remoteVideo: '',
@@ -172,7 +204,7 @@ const MyComponent = () => {
     <>
       <div className="parent">
         <div className="dummy">
-          <span>Loading</span>
+          <span>{`${loading} `}</span>
           <div className="dataLoading"></div>
         </div>
         {/* camera viewport */}
@@ -184,12 +216,14 @@ const MyComponent = () => {
             autoPlay
             playsInline
           />
-          <video
-            id="remoteVideo"
-            className="remoteVideo"
-            autoPlay
-            playsInline
-          />
+          <div className="videoContainer">
+            <video
+              id="remoteVideo"
+              className="remoteVideo"
+              autoPlay
+              playsInline
+            />
+          </div>
         </div>
         {/* control  buttons */}
         <div className="buttons-container">
@@ -203,6 +237,7 @@ const MyComponent = () => {
             onClick={() => {
               Client.Disconnect();
               stopCamera();
+              setLoading("Disconnect");
             }}
           >
             <div id="circle"></div>
