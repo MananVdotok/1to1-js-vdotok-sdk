@@ -12,8 +12,8 @@ const MyComponent = () => {
     const fetchData = () => {
       axios
         .post("https://q-tenant.vdotok.dev/API/v0/Login", {
-          project_id: "1RN1RP",
-          email: "dataMine",
+          project_id: "127OUKED",
+          email: "manan",
           password: "password",
         })
         .then((response) => {
@@ -81,7 +81,7 @@ const MyComponent = () => {
     console.log("connecting SDK to the SERVE ..................");
     console.log("user: " + JSON.stringify(user));
     let params = {
-      projectId: "1RN1RP",
+      projectId: "127OUKED",
       host: user.media_server_map.complete_address,
       stunServer: user.stun_server_map.complete_address,
       ignorePublicIP: true,
@@ -186,7 +186,8 @@ const MyComponent = () => {
         video: 1,
         audio: 1,
         videoType: "camera",
-        to: ["1RN1RP134d599402013d6396cf96e9ee757f5a"],
+        // ref_id
+        to: ["127OUKED4d7263ef12b7cd2f0679f8bcccc43e97"],
         timeout: 40,
         isPeer: 0,
       };
